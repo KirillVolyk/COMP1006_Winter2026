@@ -1,5 +1,4 @@
 <?php 
-declare(strict_types=1); 
 require "connect.php";
 require "header.php";
 require "car.php"; 
