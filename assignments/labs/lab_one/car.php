@@ -1,3 +1,8 @@
+<?php
+// make strict
+declare(strict_types=1);
+// database
+require_once "connect.php";
 class Car {
     public string $make;
     public string $model; 
