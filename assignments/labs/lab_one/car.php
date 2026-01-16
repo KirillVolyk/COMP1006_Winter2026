@@ -15,8 +15,8 @@ class Car {
     }
 
     public function getBadge(): string {
-        $role = $this->isInstructor ? "Instructor" : "Student"; 
-        return "Name : {$this->name} | Age: {$this->age} | Role : $role";
+        $carInfo = "Make: {$this->make} | Model: {$this->model} | Year: {$this->year}";
+        return $carInfo;
     }
 }
 
