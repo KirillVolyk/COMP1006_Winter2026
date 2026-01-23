@@ -1,4 +1,5 @@
-<?php 
+<?php
+require "connect.php"; 
 
 /* 
 
@@ -16,7 +17,7 @@ Lab One Instructions:
 */ 
 
 require "header.php";
-require "connect.php";  
-echo "<p> Follow the instructions outlined in instructions.txt to complete this lab. Good luck & have fun!😀 </p>";
+//require "connect.php";  
+echo "<p> Follow the instructions outlined in instructions.txt to complete this lab reviewwwwww. Good luck & have fun!😀 </p>";
 include "car.php"; 
 require "footer.php"; 
