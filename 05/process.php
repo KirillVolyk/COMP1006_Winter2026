@@ -7,7 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     die('Invalid request');
 }
 
-/*2*/
+/*2 sanitize data. Trim whitespaces before and after. Escapes special characters*/
 $firstName = trim(filter_input(INPUT_POST, 'first_name', FILTER_SANITIZE_SPECIAL_CHARS));
 $lastName  = trim(filter_input(INPUT_POST, 'last_name', FILTER_SANITIZE_SPECIAL_CHARS));
 $email     = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
@@ -15,7 +15,7 @@ $phone     = trim(filter_input(INPUT_POST, 'phone', FILTER_SANITIZE_SPECIAL_CHAR
 $address   = trim(filter_input(INPUT_POST, 'address', FILTER_SANITIZE_SPECIAL_CHARS));
 $comments  = trim(filter_input(INPUT_POST, 'comments', FILTER_SANITIZE_SPECIAL_CHARS));
 
-/*3*/
+/*3 Error arrayto store all errors that we're gonna get*/
 
 $errors = [];
 
@@ -67,7 +67,26 @@ if (!empty($errors)) {
 }
 
 /*4*/
+// build our SQL query with placeholders for the values we want to insert
 
+$sql = "INSERT INTO orders (first_name, last_name, phone, address, email, comments) VALUES (:first_name, :last_name, :phone, :address, :email, :comments)";
+
+// prepare the query
+
+$stmt = $pdo->prepare($sql);
+
+// map the named placeholders to the actual values 
+$stmt->bindParam(':first_name', $firstName);
+$stmt->bindParam(':last_name', $lastName);
+$stmt->bindParam(':phone', $phone);
+$stmt->bindParam(':address', $address);
+$stmt->bindParam(':email', $email);
+$stmt->bindParam(':comments', $comments);
+
+// execute the query
+$stmt->execute();
+// close the connection
+$pdo = null;
 
 ?>
 <? require "includes/header.php"; ?> 
