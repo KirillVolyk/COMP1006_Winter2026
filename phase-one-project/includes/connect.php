@@ -1,6 +1,6 @@
 <?php 
 $host = "localhost"; //hostname
-$db = "bakery"; //database name
+$db = "tasksdb"; //database name
 $user = "root"; //username
 $password = ""; //password
 

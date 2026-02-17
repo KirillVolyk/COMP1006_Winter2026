@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Week 6 - CRUD </title>
+    <title>Week 7 - Phase One </title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
     <link href="styles/main.css" rel="stylesheet">
@@ -14,14 +14,8 @@
     <header>
         <h1 class="site-title">
             <img
-                src="assets/bitumi.png"
-                alt="Bake It Til You Make It Bakery"
+                src="assets/tmlogo.png"
+                alt="Task Manager Logo"
                 class="logo">
         </h1>
-        <nav>
-            <a href="/"> Home </a>
-            <a href="#"> About </a>
-            <a href="#"> Order Online </a>
-            <a href="#"> Contact </a>
-        </nav>
     </header>
