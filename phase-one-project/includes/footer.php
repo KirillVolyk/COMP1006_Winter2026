@@ -1,4 +1,4 @@
 <footer>
-    <p> Bake It Til You Make It - COMP1006 </p>
-    <p> Week 4 - Form Validation</p>
+    <p> Task Manager </p>
+    <p> Phase One Project - COMP1006</p>
   </footer>

@@ -1,28 +1,23 @@
 <?php
+// Have format set
 require "includes/header.php";
-//  TODO: connect to the database 
+// Connect to the database
 require "includes/connect.php";
-//   TODO: Grab form data (no validation or sanitization for this lab)
-
-/*
-  1. Write an INSERT statement with named placeholders
-  2. Prepare the statement
-  3. Execute the statement with an array of values
+//   TODO: Grab form data with validation and sanitization
 
 
-  4.
 
-*/
-
-$sql = "INSERT INTO subscribers (first_name, last_name, email) VALUES (:first_name, :last_name, :email)";
+$sql = "INSERT INTO tasks (task_name, task_priority, task_time_estimate, task_deadline, task_status) VALUES (:task_name, :task_priority, :task_time_estimate, :task_deadline, :task_status)";
 
 // Prepare the statement
 $stmt = $pdo->prepare($sql);
 
-//bind
-$stmt->bindParam(':first_name', $_POST['first_name']);
-$stmt->bindParam(':last_name', $_POST['last_name']);
-$stmt->bindParam(':email', $_POST['email']);
+// Bind
+$stmt->bindParam(':task_name', $_POST['task_name']);
+$stmt->bindParam(':task_priority', $_POST['task_priority']);
+$stmt->bindParam(':task_time_estimate', $_POST['task_time_estimate']);
+$stmt->bindParam(':task_deadline', $_POST['task_deadline']);
+$stmt->bindParam(':task_status', $_POST['task_status']);
 
 // Execute with form data
 $stmt->execute();
@@ -34,25 +29,20 @@ $stmt->execute();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Task Created</title>
 </head>
 
 <body>
-
     <main class="container mt-4">
-        <h2>Thank You for Subscribing</h2>
+        <h2>Task Made!</h2>
 
         <!-- TODO: Display a confirmation message -->
-        <p>Thanks, <?= htmlspecialchars($_POST['first_name']) ?>! You have been added to our mailing list.</p>
-        <!-- Example: "Thanks, Name! You have been added to our mailing list." -->
-
-
-
-
+        <p>Great, <?= htmlspecialchars($_POST['task_name']) ?> has been added to the Task List.</p>
         <p class="mt-3">
-            <a href="subscribers.php">View Subscribers</a>
+            <a href="tasks.php">View Tasks</a>
         </p>
     </main>
 </body>
 
 </html>
+<?php require_once("includes/footer.php"); ?>

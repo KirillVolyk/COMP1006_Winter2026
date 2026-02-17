@@ -1,3 +1,4 @@
+<?php require_once("includes/header.php"); ?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -25,8 +26,9 @@
                 <option value="High">High</option>
             </select>
             <!-- Time Estimate -->
-            <label class="form-label mt-3" for="task_time_estimate">Time Estimate (HH:MM:SS)</label>
-            <input class="form-control" type="time" id="task_time_estimate" name="task_time_estimate">
+             <!-- Note: Time format is weird, in HH:MM:AM/PM -->
+            <label class="form-label mt-3" for="task_time_estimate">Time Estimate (Minutes)</label>
+            <input class="form-control" type="number" id="task_time_estimate" name="task_time_estimate">
             <!-- Task Deadline -->
             <label class="form-label mt-3" for="task_deadline">Task Deadline</label>
             <input class="form-control" type="datetime-local" id="task_deadline" name="task_deadline">
@@ -42,9 +44,11 @@
         </form>
         <!-- View Form -->
         <p class="mt-4">
-            <a href="subscribers.php">View Tasks</a>
+            <a href="tasks.php">View Tasks</a>
         </p>
     </main>
 </body>
 
 </html>
+
+<?php require_once("includes/footer.php"); ?>
