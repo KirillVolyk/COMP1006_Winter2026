@@ -4,14 +4,14 @@ require "includes/header.php";
 //connect to db
 require "includes/connect.php";
 // make sure we received an ID
-if (!isset($_GET['id'])) {
-  die("No order ID provided.");
+if (!isset($_GET['task_id'])) {
+  die("No task ID provided.");
 }
 
-$taskId = $_GET['id'];
+$taskId = $_GET['task_id'];
 
 // create the query 
-$sql = "DELETE FROM tasks WHERE id = :task_id";
+$sql = "DELETE FROM tasks WHERE task_id = :task_id";
 
 //prepare 
 $stmt = $pdo->prepare($sql);

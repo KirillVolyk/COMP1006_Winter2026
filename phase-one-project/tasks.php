@@ -24,20 +24,35 @@ $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
           <th>Time Estimate</th>
           <th>Deadline</th>
           <th>Status</th>
-          <th>Created At</th>
+          <th>Tasked At</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
         
         <?php foreach ($tasks as $task): ?>
           <tr>
-            <td><?= htmlspecialchars($task['id']) ?></td>
+            <td><?= htmlspecialchars($task['task_id']) ?></td>
             <td><?= htmlspecialchars($task['task_name']) ?></td>
             <td><?= htmlspecialchars($task['task_priority']) ?></td>
             <td><?= htmlspecialchars($task['task_time_estimate']) ?></td>
             <td><?= htmlspecialchars($task['task_deadline']) ?></td>
             <td><?= htmlspecialchars($task['task_status']) ?></td>
             <td><?= htmlspecialchars($task['tasked_at']) ?></td>
+            <td>
+                <!-- Sends the ID to update.php -->
+                <a
+                  class="btn btn-sm btn-warning"
+                  href="update.php?task_id=<?= urlencode($task['task_id']); ?>">
+                  Update
+                </a>
+                <a
+                  class="btn btn-sm btn-danger mt-2"
+                  href="delete.php?task_id=<?= urlencode($task['task_id']); ?>"
+                  onclick="return confirm('Are you sure you want to delete this task?');">
+                  Delete
+                </a>
+              </td>
           </tr>
         <?php endforeach; ?>
       </tbody>

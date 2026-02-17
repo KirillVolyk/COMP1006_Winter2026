@@ -1,48 +1,81 @@
 <?php
-// Have format set
-require "includes/header.php";
-// Connect to the database
 require "includes/connect.php";
-//   TODO: Grab form data with validation and sanitization
 
+// 1. Only allow POST
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    die("Invalid request");
+}
 
+// 2. Sanitize input
+$taskName   = trim(filter_input(INPUT_POST, 'task_name', FILTER_SANITIZE_SPECIAL_CHARS));
+$taskPriority   = trim(filter_input(INPUT_POST, 'task_priority', FILTER_SANITIZE_SPECIAL_CHARS));
+$taskTimeEstimate   = filter_input(INPUT_POST, 'task_time_estimate', FILTER_VALIDATE_INT);
+$taskDeadline   = trim(filter_input(INPUT_POST, 'task_deadline', FILTER_SANITIZE_SPECIAL_CHARS));
+$taskStatus     = trim(filter_input(INPUT_POST, 'task_status', FILTER_SANITIZE_SPECIAL_CHARS));
 
-$sql = "INSERT INTO tasks (task_name, task_priority, task_time_estimate, task_deadline, task_status) VALUES (:task_name, :task_priority, :task_time_estimate, :task_deadline, :task_status)";
+$errors = [];
 
-// Prepare the statement
+// 3. Validation
+if ($taskName === '' || $taskName === null) {
+    $errors[] = "Task name is required.";
+}
+
+if (!in_array($taskPriority, ['Low', 'Medium', 'High'])) {
+    $errors[] = "Invalid priority selected.";
+}
+
+if ($taskTimeEstimate === false || $taskTimeEstimate < 0) {
+    $errors[] = "Time estimate must be a positive number of minutes.";
+}
+
+if ($taskDeadline === '' || $taskDeadline === null) {
+    $errors[] = "Deadline is required.";
+}
+
+if (!in_array($taskStatus, ['Not Started', 'In Progress', 'Completed'])) {
+    $errors[] = "Invalid task status.";
+}
+
+// If errors, show them
+if (!empty($errors)) {
+    require "includes/header.php";
+
+    echo "<div class='alert alert-danger'>";
+    echo "<h2>Please fix the following:</h2><ul>";
+    foreach ($errors as $e) {
+        echo "<li>" . htmlspecialchars($e) . "</li>";
+    }
+    echo "</ul></div>";
+
+    require "includes/footer.php";
+    exit;
+}
+
+// 4. Insert into DB
+$sql = "INSERT INTO tasks 
+        (task_name, task_priority, task_time_estimate, task_deadline, task_status)
+        VALUES 
+        (:task_name, :task_priority, :task_time_estimate, :task_deadline, :task_status)";
+
 $stmt = $pdo->prepare($sql);
 
-// Bind
-$stmt->bindParam(':task_name', $_POST['task_name']);
-$stmt->bindParam(':task_priority', $_POST['task_priority']);
-$stmt->bindParam(':task_time_estimate', $_POST['task_time_estimate']);
-$stmt->bindParam(':task_deadline', $_POST['task_deadline']);
-$stmt->bindParam(':task_status', $_POST['task_status']);
+$stmt->bindParam(':task_name', $taskName);
+$stmt->bindParam(':task_priority', $taskPriority);
+$stmt->bindParam(':task_time_estimate', $taskTimeEstimate, PDO::PARAM_INT);
+$stmt->bindParam(':task_deadline', $taskDeadline);
+$stmt->bindParam(':task_status', $taskStatus);
 
-// Execute with form data
 $stmt->execute();
 
+// 5. Confirmation
+require "includes/header.php";
 ?>
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Task Created</title>
-</head>
+<div class="alert alert-success">
+    <h2>Task Created!</h2>
+    <p>Your task <strong><?= htmlspecialchars($taskName) ?></strong> has been added.</p>
+</div>
 
-<body>
-    <main class="container mt-4">
-        <h2>Task Made!</h2>
+<p><a href="tasks.php">View Tasks</a></p>
 
-        <!-- TODO: Display a confirmation message -->
-        <p>Great, <?= htmlspecialchars($_POST['task_name']) ?> has been added to the Task List.</p>
-        <p class="mt-3">
-            <a href="tasks.php">View Tasks</a>
-        </p>
-    </main>
-</body>
-
-</html>
-<?php require_once("includes/footer.php"); ?>
+<?php require "includes/footer.php"; ?>

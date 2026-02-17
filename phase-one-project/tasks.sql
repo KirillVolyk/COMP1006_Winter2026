@@ -1,5 +1,5 @@
 CREATE TABLE tasks (
-  id INT AUTO_INCREMENT PRIMARY KEY,
+  task_id INT AUTO_INCREMENT PRIMARY KEY,
   task_name  VARCHAR(255),
   task_priority ENUM('Low', 'Medium', 'High'),
   task_time_estimate TINYINT,

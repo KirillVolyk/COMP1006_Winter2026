@@ -4,23 +4,23 @@ require "includes/header.php";
 // Connect to the database
 require "includes/connect.php";
 
-if (!isset($_GET['id'])) {
+if (!isset($_GET['task_id'])) {
   die("No Task ID provided.");
 }
 
-$taskId = $_GET['id'];
+$taskId = $_GET['task_id'];
 
 /* -------------------------------------------
    STEP 2: If form is submitted, UPDATE the row
 -------------------------------------------- */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-  // Basic sanitization (trim removes extra spaces) || Commented out where user doesn input these fields directly
+  // Basic sanitization (trim removes extra spaces
   $taskName = trim($_POST['task_name'] ?? '');
-  //$taskPriority = trim($_POST['task_priority'] ?? '');
+  $taskPriority = trim($_POST['task_priority'] ?? '');
   $taskTimeEstimate = trim($_POST['task_time_estimate'] ?? '');
-  //$taskDeadline = trim($_POST['task_deadline'] ?? '');
-  //$taskStatus = trim($_POST['task_status'] ?? '');
+  $taskDeadline = trim($_POST['task_deadline'] ?? '');
+  $taskStatus = trim($_POST['task_status'] ?? '');
 
 
   // Input Fields (force to their own types, prevent blanks)
@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $error = "Task name is required.";
   } else {
   // Update query with named placeholders
-    $sql = "UPDATE tasks1
+    $sql = "UPDATE tasks
             SET task_name = :task_name,
                 task_priority = :task_priority,
                 task_time_estimate = :task_time_estimate,
@@ -47,7 +47,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->bindParam(':task_time_estimate', $taskTimeEstimate);
     $stmt->bindParam(':task_deadline', $taskDeadline);
     $stmt->bindParam(':task_status', $taskStatus);
-
     $stmt->bindParam(':task_id', $taskId);
 
     $stmt->execute();
@@ -82,7 +81,7 @@ if (!$task) {
 
   <!--
     This form is pre-filled using the task data pulled from the database.
-    The admin can edit the values and submit to update the row.
+    The admin(in the) can edit the values and submit to update the row.
   -->
   <form method="post">
 
