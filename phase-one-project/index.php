@@ -9,7 +9,11 @@
 </head>
 
 <body>
-
+    <!-- Notes: 
+    - Make deadline properly formatted yar (4 digits not 6, and a limit from current year up to 10 years in the future)(not for phase one prob)
+    - Work on CSS more, make it look nicer, match the color, align logos, and other text(maybe for phase one)
+    - Add more senitization and validation, like making sure the time estimate is a positive number, and that the deadline is in the future, aswell no special characters in the task name. (for phase one)
+     -->
     <main class="container mt-4">
         <h1>Make A Task!</h1>
 

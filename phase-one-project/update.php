@@ -3,16 +3,13 @@
 require "includes/header.php";
 // Connect to the database
 require "includes/connect.php";
-
+// Make sure to get the id
 if (!isset($_GET['task_id'])) {
   die("No Task ID provided.");
 }
 
 $taskId = $_GET['task_id'];
-
-/* -------------------------------------------
-   STEP 2: If form is submitted, UPDATE the row
--------------------------------------------- */
+// Handle form submission if its POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   // Basic sanitization (trim removes extra spaces
