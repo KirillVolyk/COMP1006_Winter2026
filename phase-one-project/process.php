@@ -15,9 +15,9 @@ $taskStatus     = trim(filter_input(INPUT_POST, 'task_status', FILTER_SANITIZE_S
 
 $errors = [];
 
-// 3. Validation
-if ($taskName === '' || $taskName === null) {
-    $errors[] = "Task name is required.";
+// 3. Server Side Validation (Empty checks, special characters checks)
+if (!preg_match('/^[a-zA-Z0-9\s]+$/', $taskName)) {
+    $errors[] = "Task name is required and must only contain letters, numbers, and spaces.";
 }
 
 if (!in_array($taskPriority, ['Low', 'Medium', 'High'])) {

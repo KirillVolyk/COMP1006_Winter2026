@@ -21,11 +21,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
   // Input Fields (force to their own types, prevent blanks)
-  $taskTimeEstimate       = (int)($taskTimeEstimate ?? 0);
+  $taskTimeEstimate = (int)($taskTimeEstimate ?? 0);
 
-  // Simple validation (beginner-friendly)
-  if ($taskName === '') {
-    $error = "Task name is required.";
+  // Validation
+  if (!preg_match('/^[a-zA-Z0-9\s]+$/', $taskName)) {
+    $error = "Task name is required and must only contain letters, numbers, and spaces.";
   } else {
   // Update query with named placeholders
     $sql = "UPDATE tasks
@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $stmt = $pdo->prepare($sql);
 
-    // Bind parameters (safe + beginner friendly)
+    // Bind parameters
     $stmt->bindParam(':task_name', $taskName);
     $stmt->bindParam(':task_priority', $taskPriority);
     $stmt->bindParam(':task_time_estimate', $taskTimeEstimate);
@@ -48,15 +48,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $stmt->execute();
 
-    // Redirect back to the tasks list (prevents resubmission on refresh)
+    // Redirect back to the tasks list 
     header("Location: tasks.php");
     exit;
   }
 }
 
-/* -------------------------------------------
-   STEP 3: Load existing task data (to echo in the form)
--------------------------------------------- */
+
+// Fetch the existing task data
 $sql = "SELECT * FROM tasks WHERE task_id = :task_id";
 $stmt = $pdo->prepare($sql);
 $stmt->bindParam(':task_id', $taskId);
@@ -64,11 +63,13 @@ $stmt->execute();
 
 $task = $stmt->fetch();
 
+// If no task found
 if (!$task) {
   die("Task not found.");
 }
 ?>
 
+<!-- Show task id -->
 <main class="container mt-4">
   <h2>Update Task #<?= htmlspecialchars($task['task_id']); ?></h2>
 
@@ -84,7 +85,7 @@ if (!$task) {
 
     <h4 class="mt-3">Task Info</h4>
 
-    <!-- Task Name -->
+    <!-- Task Name no Special characters -->
     <label class="form-label">Task Name</label>
     <input
       type="text"
@@ -94,7 +95,7 @@ if (!$task) {
       required
     >
 
-    <!-- Task Priority -->
+    <!-- Task Priority 3 Options-->
     <label class="form-label">Task Priority</label>
     <select name="task_priority" class="form-select mb-3">
         <option value="Low" <?= $task['task_priority'] === 'Low' ? 'selected' : '' ?>>Low</option>
@@ -102,7 +103,7 @@ if (!$task) {
         <option value="High" <?= $task['task_priority'] === 'High' ? 'selected' : '' ?>>High</option>
     </select>
 
-    <!-- Time Estimate (minutes) -->
+    <!-- Time Estimate (minutes) positive -->
     <label class="form-label">Task Time Estimate (Minutes)</label>
     <input
       type="number"
@@ -111,7 +112,7 @@ if (!$task) {
       value="<?= htmlspecialchars($task['task_time_estimate']); ?>"
     >
 
-    <!-- Deadline -->
+    <!-- Deadline YYYY(YY)-MM--DD :::: Fix the extra 2 digits for the year, somehow... -->
     <label class="form-label">Task Deadline</label>
     <input
       type="datetime-local"
@@ -120,7 +121,7 @@ if (!$task) {
       value="<?= htmlspecialchars(str_replace(' ', 'T', $task['task_deadline'])); ?>"
     >
 
-    <!-- Task Status -->
+    <!-- Task Status 3 Options -->
     <label class="form-label">Task Status</label>
     <select name="task_status" class="form-select mb-3">
         <option value="Not Started" <?= $task['task_status'] === 'Not Started' ? 'selected' : '' ?>>Not Started</option>
