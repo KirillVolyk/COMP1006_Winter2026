@@ -44,9 +44,9 @@ Fields:
 Using the provided HTML form:
 
 <!-- - Accept user input  --> Yes
-- Sanitize and validate the form data on the server
-- If valid, store the review in the database
-- If invalid, display an error message and do not insert the record
+<!-- - Sanitize and validate the form data on the server --> yes
+<!-- - If valid, store the review in the database --> yes
+<!-- - If invalid, display an error message and do not insert the record --> yes
 
 ---
 
@@ -54,9 +54,9 @@ Using the provided HTML form:
 
 Create an admin page that:
 
-- Retrieves all book reviews from the database
-- Displays them in a dynamically generated HTML table
-- Includes Update and Delete options for each review
+<!-- - Retrieves all book reviews from the database --> yes
+<!-- - Displays them in a dynamically generated HTML table --> yes
+<!-- - Includes Update and Delete options for each review --> yes, not function though
 
 ---
 
@@ -85,10 +85,10 @@ You must implement server-side validation. (3 marks)
 
 At minimum:
 
-- Required fields must not be empty
-- Numeric fields must contain valid numbers
-- Data must be sanitized before storing
-- Invalid data must not be inserted into the database
+<!-- - Required fields must not be empty --> yes
+<!-- - Numeric fields must contain valid numbers --> yes
+<!-- - Data must be sanitized before storing --> yes, doesnt let specila characters in
+<!-- - Invalid data must not be inserted into the database --> yes, there are validation(client and server)
 
 ---
 
@@ -96,9 +96,9 @@ At minimum:
 
 Your solution must:
 
-- Use PDO and prepared statements
+<!-- - Use PDO and prepared statements --> yes
 - Include code comments explaining your logic (2 marks) 
-- Avoid placing raw user input directly into SQL statements
+<!-- - Avoid placing raw user input directly into SQL statements --> yes?
 
 ---
 

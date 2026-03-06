@@ -1,12 +1,12 @@
 <?php
 require "connect.php";
 
-// 1. Only allow POST
+// Only allow POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     die("Invalid request");
 }
 
-// 2. Sanitize input
+// Sanitize input
 $title   = trim(filter_input(INPUT_POST, 'title', FILTER_SANITIZE_SPECIAL_CHARS));
 $author   = trim(filter_input(INPUT_POST, 'author', FILTER_SANITIZE_SPECIAL_CHARS));
 $rating   = filter_input(INPUT_POST, 'rating', FILTER_VALIDATE_INT);
@@ -14,23 +14,23 @@ $review_text   = trim(filter_input(INPUT_POST, 'review_text', FILTER_SANITIZE_SP
 
 $errors = [];
 
-// 3. Server Side Validation (Empty checks, special characters checks, allow only certain characters, etc.)
+// Server Side Validation (Empty checks, special characters checks, allow only certain characters, etc.)
+// Checks title for ONLY having letters, numbers, and spaces (no special characters)
 if (!preg_match('/^[a-zA-Z0-9\s]+$/', $title)) {
     $errors[] = "Book title is required and must only contain letters, numbers, and spaces.";
 }
-
+// Checks author for ONLY having letters, numbers, and spaces (no special characters)
 if (!preg_match('/^[a-zA-Z0-9\s]+$/', $author)) {
     $errors[] = "Author name is required and must only contain letters, numbers, and spaces.";
 }
-
+// Checks rating is a number between 1 and 5
 if ($rating === false || $rating < 1 || $rating > 5) {
     $errors[] = "Rating must be a number between 1 and 5.";
 }
-
+// Checks review text is not empty
 if ($review_text === '' || $review_text === null) {
     $errors[] = "Review is required.";
 }
-
 // If errors, show them
 if (!empty($errors)) {
 
@@ -43,7 +43,7 @@ if (!empty($errors)) {
     exit;
 }
 
-// 4. Insert into DB
+// Insert into DB
 $sql = "INSERT INTO reviews 
         (title, author, rating, review_text)
         VALUES 
@@ -60,10 +60,10 @@ $stmt->execute();
 
 ?>
 
-<!-- 5. Confirmation -->
+<!-- Confirmation -->
 <div class="alert alert-success">
     <h2>Review Submitted!</h2>
     <p>Your review for <strong><?= htmlspecialchars($title) ?></strong> has been added.</p>
 </div>
 
-<p><a href="reviews.php">View Reviews</a></p>
+<p><a href="admin.php">View Reviews</a></p>
