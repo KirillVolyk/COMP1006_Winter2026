@@ -33,7 +33,7 @@ Fields:
 - `review_text`
 - `created_at`
 
-You must connect to the database using PDO.
+<!-- You must connect to the database using PDO. --> I think
 
 ---
 
@@ -43,7 +43,7 @@ You must connect to the database using PDO.
 
 Using the provided HTML form:
 
-- Accept user input
+<!-- - Accept user input  --> Yes
 - Sanitize and validate the form data on the server
 - If valid, store the review in the database
 - If invalid, display an error message and do not insert the record
