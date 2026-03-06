@@ -7,27 +7,27 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 // 2. Sanitize input
-$bookName   = trim(filter_input(INPUT_POST, 'title', FILTER_SANITIZE_SPECIAL_CHARS));
-$bookAuthor   = trim(filter_input(INPUT_POST, 'author', FILTER_SANITIZE_SPECIAL_CHARS));
-$bookRating   = filter_input(INPUT_POST, 'rating', FILTER_VALIDATE_INT);
-$bookReview   = trim(filter_input(INPUT_POST, 'review_text', FILTER_SANITIZE_SPECIAL_CHARS));
+$title   = trim(filter_input(INPUT_POST, 'title', FILTER_SANITIZE_SPECIAL_CHARS));
+$author   = trim(filter_input(INPUT_POST, 'author', FILTER_SANITIZE_SPECIAL_CHARS));
+$rating   = filter_input(INPUT_POST, 'rating', FILTER_VALIDATE_INT);
+$review_text   = trim(filter_input(INPUT_POST, 'review_text', FILTER_SANITIZE_SPECIAL_CHARS));
 
 $errors = [];
 
 // 3. Server Side Validation (Empty checks, special characters checks, allow only certain characters, etc.)
-if (!preg_match('/^[a-zA-Z0-9\s]+$/', $bookName)) {
+if (!preg_match('/^[a-zA-Z0-9\s]+$/', $title)) {
     $errors[] = "Book title is required and must only contain letters, numbers, and spaces.";
 }
 
-if (!preg_match('/^[a-zA-Z0-9\s]+$/', $bookAuthor)) {
+if (!preg_match('/^[a-zA-Z0-9\s]+$/', $author)) {
     $errors[] = "Author name is required and must only contain letters, numbers, and spaces.";
 }
 
-if ($bookRating === false || $bookRating < 1 || $bookRating > 5) {
+if ($rating === false || $rating < 1 || $rating > 5) {
     $errors[] = "Rating must be a number between 1 and 5.";
 }
 
-if ($bookReview === '' || $bookReview === null) {
+if ($review_text === '' || $review_text === null) {
     $errors[] = "Review is required.";
 }
 
@@ -45,16 +45,16 @@ if (!empty($errors)) {
 
 // 4. Insert into DB
 $sql = "INSERT INTO reviews 
-        (book_name, book_author, book_rating, book_review)
+        (title, author, rating, review_text)
         VALUES 
-        (:book_name, :book_author, :book_rating, :book_review)";
+        (:title, :author, :rating, :review_text)";
 
 $stmt = $pdo->prepare($sql);
 
-$stmt->bindParam(':book_name', $bookName);
-$stmt->bindParam(':book_author', $bookAuthor);
-$stmt->bindParam(':book_rating', $bookRating, PDO::PARAM_INT);
-$stmt->bindParam(':book_review', $bookReview);
+$stmt->bindParam(':title', $title);
+$stmt->bindParam(':author', $author);
+$stmt->bindParam(':rating', $rating, PDO::PARAM_INT);
+$stmt->bindParam(':review_text', $review_text);
 
 $stmt->execute();
 
@@ -63,7 +63,7 @@ $stmt->execute();
 <!-- 5. Confirmation -->
 <div class="alert alert-success">
     <h2>Review Submitted!</h2>
-    <p>Your review for <strong><?= htmlspecialchars($bookName) ?></strong> has been added.</p>
+    <p>Your review for <strong><?= htmlspecialchars($title) ?></strong> has been added.</p>
 </div>
 
 <p><a href="reviews.php">View Reviews</a></p>

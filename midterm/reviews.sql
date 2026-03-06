@@ -1,7 +1,4 @@
-CREATE DATABASE IF NOT EXISTS book_manager;
-USE book_manager;
-
-CREATE TABLE IF NOT EXISTS reviews (
+CREATE TABLE reviews (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(150) NOT NULL,
     author VARCHAR(150) NOT NULL,
