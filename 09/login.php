@@ -30,19 +30,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // SQL query to find a user with the matching username OR email
         // LIMIT 1 ensures only one user record is returned
-        
+        $sql = "SELECT * FROM users WHERE username = :login OR email = :login LIMIT 1";
 
         // Prepare the SQL statement using PDO
-     
+        $stmt = $pdo->prepare($sql);
 
         // Bind the user input to the :login parameter
-        
-        
+        $stmt->bindValue(':login', $usernameOrEmail);
+
         // Execute the query
-    
+        $stmt->execute();
 
         // Fetch the matching user as an associative array
-    
+
 
         // Check two conditions:
         // 1. A user record was found
@@ -51,12 +51,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // Regenerate the session ID for security
             // This helps prevent session fixation attacks
+            session_regenerate_id(true);
            
             // Store user information in session variables
             // These variables indicate the user is now logged in
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['username'] = $user['username'];
         
             // Redirect the user to the protected orders page
-           
+            header("Location: orders.php");
+            exit();
 
             // Stop the script immediately after redirecting
 
@@ -64,7 +68,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
 
             // If login fails, display an error message
-           
+            $error = "Invalid username/email or password.";
+
         }
     }
 }
