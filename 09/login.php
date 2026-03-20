@@ -1,8 +1,7 @@
 <?php
 // Start or resume the session.
+session_start( );
 // Sessions allow us to store login information across multiple pages.
-
-
 require "includes/connect.php";
 require "includes/header.php";
 
@@ -30,6 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // SQL query to find a user with the matching username OR email
         // LIMIT 1 ensures only one user record is returned
+<<<<<<< HEAD
         $sql = "SELECT * FROM users WHERE username = :login OR email = :login LIMIT 1";
 
         // Prepare the SQL statement using PDO
@@ -43,6 +43,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Fetch the matching user as an associative array
 
+=======
+        $sql = "SELECT id, username, email, password FROM users WHERE username = :login OR email = :login LIMIT 1"; 
+
+        // Prepare the SQL statement using PDO
+        $stmt = $pdo->prepare($sql); 
+
+        // Bind the user input to the :login parameter
+        $stmt->bindParam(':login', $usernameOrEmail); 
+        
+        // Execute the query
+        $stmt->execute(); 
+
+        // Fetch the matching user as an associative array
+        $user = $stmt->fetch(PDO::FETCH_ASSOC); 
+>>>>>>> f18205ce1060b62527b55432e7ff5b0df752dc1d
 
         // Check two conditions:
         // 1. A user record was found
@@ -55,6 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
            
             // Store user information in session variables
             // These variables indicate the user is now logged in
+<<<<<<< HEAD
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['username'];
         
@@ -62,14 +78,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header("Location: orders.php");
             exit();
 
-            // Stop the script immediately after redirecting
+=======
+            $_SESSION['user_id'] = $user['id']; 
+            $_SESSION['username'] = $user['username']; 
 
+            // Redirect the user to the protected orders page
+            header("Location: orders.php"); 
+           
+>>>>>>> f18205ce1060b62527b55432e7ff5b0df752dc1d
+            // Stop the script immediately after redirecting
+            exit; 
 
         } else {
 
             // If login fails, display an error message
+<<<<<<< HEAD
             $error = "Invalid username/email or password.";
 
+=======
+            $error = "Invalid credentials. Please try again!"; 
+>>>>>>> f18205ce1060b62527b55432e7ff5b0df752dc1d
         }
     }
 }

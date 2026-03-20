@@ -1,6 +1,4 @@
-
 <?php
-//include auth file to restrict users access to the page 
 require "includes/auth.php";
 require "includes/header_admin.php";
 require "includes/connect.php";
@@ -111,8 +109,4 @@ $orders = $stmt->fetchAll();
       window.location.reload();
     }
   });
-<<<<<<< HEAD
-</script>ß
-=======
 </script>
->>>>>>> f18205ce1060b62527b55432e7ff5b0df752dc1d
