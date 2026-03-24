@@ -1,6 +1,6 @@
 <?php 
 $host = "localhost"; //hostname
-$db = "week10"; //database name
+$db = "lab3"; //database name
 $user = "root"; //username
 $password = ""; //password
 

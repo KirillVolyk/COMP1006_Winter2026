@@ -112,7 +112,7 @@ if (!empty($errors)) {
 // NOTE: We insert ALL item columns every time.
 // If an item was not ordered, we store 0 for that column.
 $sql = "
-    INSERT INTO orders1 (
+    INSERT INTO orders (
         first_name,
         last_name,
         phone,
