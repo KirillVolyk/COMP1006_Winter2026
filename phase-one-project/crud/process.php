@@ -1,5 +1,9 @@
 <?php
-require "includes/connect.php";
+// this file handles proper pathing
+require_once dirname(__DIR__) . '/config.php';
+
+// DB connection
+require_once INCLUDES . 'connect.php';
 
 // 1. Only allow POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -7,15 +11,15 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 // 2. Sanitize input
-$taskName   = trim(filter_input(INPUT_POST, 'task_name', FILTER_SANITIZE_SPECIAL_CHARS));
-$taskPriority   = trim(filter_input(INPUT_POST, 'task_priority', FILTER_SANITIZE_SPECIAL_CHARS));
-$taskTimeEstimate   = filter_input(INPUT_POST, 'task_time_estimate', FILTER_VALIDATE_INT);
-$taskDeadline   = trim(filter_input(INPUT_POST, 'task_deadline', FILTER_SANITIZE_SPECIAL_CHARS));
-$taskStatus     = trim(filter_input(INPUT_POST, 'task_status', FILTER_SANITIZE_SPECIAL_CHARS));
+$taskName         = trim(filter_input(INPUT_POST, 'task_name', FILTER_SANITIZE_SPECIAL_CHARS));
+$taskPriority     = trim(filter_input(INPUT_POST, 'task_priority', FILTER_SANITIZE_SPECIAL_CHARS));
+$taskTimeEstimate = filter_input(INPUT_POST, 'task_time_estimate', FILTER_VALIDATE_INT);
+$taskDeadline     = trim(filter_input(INPUT_POST, 'task_deadline', FILTER_SANITIZE_SPECIAL_CHARS));
+$taskStatus       = trim(filter_input(INPUT_POST, 'task_status', FILTER_SANITIZE_SPECIAL_CHARS));
 
 $errors = [];
 
-// 3. Server Side Validation (Empty checks, special characters checks)
+// 3. Server Side Validation
 if (!preg_match('/^[a-zA-Z0-9\s]+$/', $taskName)) {
     $errors[] = "Task name is required and must only contain letters, numbers, and spaces.";
 }
@@ -38,7 +42,7 @@ if (!in_array($taskStatus, ['Not Started', 'In Progress', 'Completed'])) {
 
 // If errors, show them
 if (!empty($errors)) {
-    require "includes/header.php";
+    require_once INCLUDES . 'header.php';
 
     echo "<div class='alert alert-danger'>";
     echo "<h2>Please fix the following:</h2><ul>";
@@ -47,7 +51,7 @@ if (!empty($errors)) {
     }
     echo "</ul></div>";
 
-    require "includes/footer.php";
+    require_once INCLUDES . 'footer.php';
     exit;
 }
 
@@ -68,7 +72,7 @@ $stmt->bindParam(':task_status', $taskStatus);
 $stmt->execute();
 
 // 5. Confirmation
-require "includes/header.php";
+require_once INCLUDES . 'header.php';
 ?>
 
 <div class="alert alert-success">
@@ -76,6 +80,6 @@ require "includes/header.php";
     <p>Your task <strong><?= htmlspecialchars($taskName) ?></strong> has been added.</p>
 </div>
 
-<p><a href="tasks.php">View Tasks</a></p>
+<p><a href="<?= URL_ROOT ?>/crud/tasks.php">View Tasks</a></p>
 
-<?php require "includes/footer.php"; ?>
+<?php require_once INCLUDES . 'footer.php'; ?>

@@ -1,6 +1,10 @@
 <?php
-require_once("includes/header.php");
-require "includes/connect.php";
+// this file handles proper pathing
+require_once dirname(__DIR__) . '/config.php';
+
+// header + db
+require_once INCLUDES . 'header.php';
+require_once INCLUDES . 'connect.php';
 
 $sql = "SELECT * FROM tasks ORDER BY tasked_at DESC";
 
@@ -43,12 +47,13 @@ $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <!-- Sends the ID to update.php -->
                 <a
                   class="btn btn-sm btn-warning"
-                  href="update.php?task_id=<?= urlencode($task['task_id']); ?>">
+                  href="<?= URL_ROOT ?>/crud/update.php?task_id=<?= urlencode($task['task_id']); ?>">
                   Update
                 </a>
+
                 <a
                   class="btn btn-sm btn-danger mt-2"
-                  href="delete.php?task_id=<?= urlencode($task['task_id']); ?>"
+                  href="<?= URL_ROOT ?>/crud/delete.php?task_id=<?= urlencode($task['task_id']); ?>"
                   onclick="return confirm('Are you sure you want to delete this task?');">
                   Delete
                 </a>
@@ -60,8 +65,8 @@ $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
   <?php endif; ?>
 
   <p class="mt-3">
-    <a href="index.php">Back to Task Manager</a>
+    <a href="<?= URL_ROOT ?>/index.php">Back to Task Manager</a>
   </p>
 </main>
 
-<?php require_once "includes/footer.php"; ?>
+<?php require_once INCLUDES . 'footer.php'; ?>
