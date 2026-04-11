@@ -15,8 +15,8 @@ if (isset($_SESSION['user_id'])) {
 // ── reCAPTCHA credentials ────────────────────────────────
 // Replace these with your keys from:
 // https://www.google.com/recaptcha/admin/create  (choose v2 "I'm not a robot")
-define('RECAPTCHA_SITE_KEY',   'YOUR_RECAPTCHA_SITE_KEY');
-define('RECAPTCHA_SECRET_KEY', 'YOUR_RECAPTCHA_SECRET_KEY');
+define('RECAPTCHA_SITE_KEY',   '6Le2mbEsAAAAABNjVNH2udfYeQxnnqFC-LucdpRe');
+define('RECAPTCHA_SECRET_KEY', '6Le2mbEsAAAAANG_RTqurPQrtZYoEGR_PfpdpvXG');
 
 $error = "";
 
