@@ -5,12 +5,12 @@ require_once dirname(__DIR__) . '/config.php';
 // DB connection
 require_once INCLUDES . 'connect.php';
 
-// 1. Only allow POST
+// Only allow POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     die("Invalid request");
 }
 
-// 2. Sanitize input
+// Sanitize input
 $taskName         = trim(filter_input(INPUT_POST, 'task_name',          FILTER_SANITIZE_SPECIAL_CHARS));
 $taskPriority     = trim(filter_input(INPUT_POST, 'task_priority',      FILTER_SANITIZE_SPECIAL_CHARS));
 $taskTimeEstimate = filter_input(INPUT_POST, 'task_time_estimate',      FILTER_VALIDATE_INT);
@@ -20,10 +20,9 @@ $taskStatus       = trim(filter_input(INPUT_POST, 'task_status',        FILTER_S
 // This will store the image path for the database
 $imagePath = null;
 
-// Array for validation errors
 $errors = [];
 
-// 3. Server Side Validation
+// Validation
 if (!preg_match('/^[a-zA-Z0-9\s]+$/', $taskName)) {
     $errors[] = "Task name is required and must only contain letters, numbers, and spaces.";
 }
@@ -44,7 +43,7 @@ if (!in_array($taskStatus, ['Not Started', 'In Progress', 'Completed'])) {
     $errors[] = "Invalid task status.";
 }
 
-// Validate and handle image upload (only if a file was chosen)
+// Handle image upload if a file was chosen
 if (isset($_FILES['task_image']) && $_FILES['task_image']['error'] !== UPLOAD_ERR_NO_FILE) {
 
     $allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
@@ -56,32 +55,23 @@ if (isset($_FILES['task_image']) && $_FILES['task_image']['error'] !== UPLOAD_ER
     } elseif ($_FILES['task_image']['size'] > $maxSize) {
         $errors[] = "Image must be under 5 MB.";
 
+    } elseif (!in_array($_FILES['task_image']['type'], $allowedTypes)) {
+        $errors[] = "Only JPG, PNG, and WEBP images are allowed.";
+
     } else {
-        // Check real MIME type using finfo (not just browser-reported type)
-        $finfo    = new finfo(FILEINFO_MIME_TYPE);
-        $mimeType = $finfo->file($_FILES['task_image']['tmp_name']);
+        $uploadDir = BASE_PATH . '/uploads/';
+        $ext       = pathinfo($_FILES['task_image']['name'], PATHINFO_EXTENSION);
+        $filename  = uniqid() . '.' . strtolower($ext);
 
-        if (!in_array($mimeType, $allowedTypes)) {
-            $errors[] = "Only JPG, PNG, and WEBP images are allowed.";
-
+        if (!move_uploaded_file($_FILES['task_image']['tmp_name'], $uploadDir . $filename)) {
+            $errors[] = "Could not save the image.";
         } else {
-            // Build upload folder path
-            $uploadDir = BASE_PATH . '/uploads/';
-
-            // Generate a unique filename to avoid conflicts
-            $ext      = pathinfo($_FILES['task_image']['name'], PATHINFO_EXTENSION);
-            $filename = bin2hex(random_bytes(12)) . '.' . strtolower($ext);
-
-            if (!move_uploaded_file($_FILES['task_image']['tmp_name'], $uploadDir . $filename)) {
-                $errors[] = "Could not save the image. Check folder permissions.";
-            } else {
-                $imagePath = URL_ROOT . '/uploads/' . $filename;
-            }
+            $imagePath = URL_ROOT . '/uploads/' . $filename;
         }
     }
 }
 
-// If there are no errors, insert into DB
+// If no errors, insert into DB
 if (empty($errors)) {
     $sql = "INSERT INTO tasks 
             (task_name, task_priority, task_time_estimate, task_deadline, task_status, image_path)
@@ -100,7 +90,6 @@ if (empty($errors)) {
     $success = "Task created successfully!";
 }
 
-// Show header after processing
 require_once INCLUDES . 'header.php';
 ?>
 
@@ -125,7 +114,7 @@ require_once INCLUDES . 'header.php';
             <p>Your task <strong><?= htmlspecialchars($taskName) ?></strong> has been added.</p>
         </div>
         <a href="<?= URL_ROOT ?>/crud/tasks.php" class="btn btn-primary">View Tasks</a>
-        <a href="<?= URL_ROOT ?>/index.php"       class="btn btn-secondary ms-2">Add Another</a>
+        <a href="<?= URL_ROOT ?>/index.php" class="btn btn-secondary ms-2">Add Another</a>
     </div>
 <?php endif; ?>
 
