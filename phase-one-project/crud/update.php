@@ -2,126 +2,131 @@
 // this file handles proper pathing
 require_once dirname(__DIR__) . '/config.php';
 
-// header + db
-require_once INCLUDES . 'header.php';
+// DB connection
 require_once INCLUDES . 'connect.php';
 
-// Make sure to get the id
-if (!isset($_GET['task_id'])) {
-    die("No Task ID provided.");
+// 1. Only allow POST
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    die("Invalid request");
 }
 
-$taskId = $_GET['task_id'];
+// 2. Sanitize input
+$taskName         = trim(filter_input(INPUT_POST, 'task_name',          FILTER_SANITIZE_SPECIAL_CHARS));
+$taskPriority     = trim(filter_input(INPUT_POST, 'task_priority',      FILTER_SANITIZE_SPECIAL_CHARS));
+$taskTimeEstimate = filter_input(INPUT_POST, 'task_time_estimate',      FILTER_VALIDATE_INT);
+$taskDeadline     = trim(filter_input(INPUT_POST, 'task_deadline',      FILTER_SANITIZE_SPECIAL_CHARS));
+$taskStatus       = trim(filter_input(INPUT_POST, 'task_status',        FILTER_SANITIZE_SPECIAL_CHARS));
 
-// Handle form submission if it's POST
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+// This will store the image path for the database
+$imagePath = null;
 
-    // Basic sanitization
-    $taskName         = trim($_POST['task_name'] ?? '');
-    $taskPriority     = trim($_POST['task_priority'] ?? '');
-    $taskTimeEstimate = trim($_POST['task_time_estimate'] ?? '');
-    $taskDeadline     = trim($_POST['task_deadline'] ?? '');
-    $taskStatus       = trim($_POST['task_status'] ?? '');
+// Array for validation errors
+$errors = [];
 
-    $taskTimeEstimate = (int)($taskTimeEstimate ?? 0);
+// 3. Server Side Validation
+if (!preg_match('/^[a-zA-Z0-9\s]+$/', $taskName)) {
+    $errors[] = "Task name is required and must only contain letters, numbers, and spaces.";
+}
 
-    // Validation
-    if (!preg_match('/^[a-zA-Z0-9\s]+$/', $taskName)) {
-        $error = "Task name is required and must only contain letters, numbers, and spaces.";
+if (!in_array($taskPriority, ['Low', 'Medium', 'High'])) {
+    $errors[] = "Invalid priority selected.";
+}
+
+if ($taskTimeEstimate === false || $taskTimeEstimate < 0) {
+    $errors[] = "Time estimate must be a positive number of minutes.";
+}
+
+if ($taskDeadline === '' || $taskDeadline === null) {
+    $errors[] = "Deadline is required.";
+}
+
+if (!in_array($taskStatus, ['Not Started', 'In Progress', 'Completed'])) {
+    $errors[] = "Invalid task status.";
+}
+
+// Validate and handle image upload (only if a file was chosen)
+if (isset($_FILES['task_image']) && $_FILES['task_image']['error'] !== UPLOAD_ERR_NO_FILE) {
+
+    $allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    $maxSize      = 5 * 1024 * 1024; // 5 MB
+
+    if ($_FILES['task_image']['error'] !== UPLOAD_ERR_OK) {
+        $errors[] = "Image upload failed.";
+
+    } elseif ($_FILES['task_image']['size'] > $maxSize) {
+        $errors[] = "Image must be under 5 MB.";
+
     } else {
+        // Check real MIME type using finfo (not just browser-reported type)
+        $finfo    = new finfo(FILEINFO_MIME_TYPE);
+        $mimeType = $finfo->file($_FILES['task_image']['tmp_name']);
 
-        $sql = "UPDATE tasks
-                SET task_name = :task_name,
-                    task_priority = :task_priority,
-                    task_time_estimate = :task_time_estimate,
-                    task_deadline = :task_deadline,
-                    task_status = :task_status
-                WHERE task_id = :task_id";
+        if (!in_array($mimeType, $allowedTypes)) {
+            $errors[] = "Only JPG, PNG, and WEBP images are allowed.";
 
-        $stmt = $pdo->prepare($sql);
+        } else {
+            // Build upload folder path
+            $uploadDir = BASE_PATH . '/uploads/';
 
-        $stmt->bindParam(':task_name', $taskName);
-        $stmt->bindParam(':task_priority', $taskPriority);
-        $stmt->bindParam(':task_time_estimate', $taskTimeEstimate);
-        $stmt->bindParam(':task_deadline', $taskDeadline);
-        $stmt->bindParam(':task_status', $taskStatus);
-        $stmt->bindParam(':task_id', $taskId);
+            // Generate a unique filename to avoid conflicts
+            $ext      = pathinfo($_FILES['task_image']['name'], PATHINFO_EXTENSION);
+            $filename = bin2hex(random_bytes(12)) . '.' . strtolower($ext);
 
-        $stmt->execute();
-
-        // Redirect back to the tasks list
-        header("Location: " . URL_ROOT . "/crud/tasks.php");
-        exit;
+            if (!move_uploaded_file($_FILES['task_image']['tmp_name'], $uploadDir . $filename)) {
+                $errors[] = "Could not save the image. Check folder permissions.";
+            } else {
+                $imagePath = URL_ROOT . '/uploads/' . $filename;
+            }
+        }
     }
 }
 
-// Fetch the existing task data
-$sql = "SELECT * FROM tasks WHERE task_id = :task_id";
-$stmt = $pdo->prepare($sql);
-$stmt->bindParam(':task_id', $taskId);
-$stmt->execute();
+// If there are no errors, insert into DB
+if (empty($errors)) {
+    $sql = "INSERT INTO tasks 
+            (task_name, task_priority, task_time_estimate, task_deadline, task_status, image_path)
+            VALUES 
+            (:task_name, :task_priority, :task_time_estimate, :task_deadline, :task_status, :image_path)";
 
-$task = $stmt->fetch();
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':task_name',          $taskName);
+    $stmt->bindParam(':task_priority',      $taskPriority);
+    $stmt->bindParam(':task_time_estimate', $taskTimeEstimate, PDO::PARAM_INT);
+    $stmt->bindParam(':task_deadline',      $taskDeadline);
+    $stmt->bindParam(':task_status',        $taskStatus);
+    $stmt->bindParam(':image_path',         $imagePath);
+    $stmt->execute();
 
-if (!$task) {
-    die("Task not found.");
+    $success = "Task created successfully!";
 }
+
+// Show header after processing
+require_once INCLUDES . 'header.php';
 ?>
 
-<main class="container mt-4">
-    <h2>Update Task #<?= htmlspecialchars($task['task_id']); ?></h2>
+<?php if (!empty($errors)): ?>
+    <div class="container mt-4">
+        <div class="alert alert-danger">
+            <h3>Please fix the following:</h3>
+            <ul class="mb-0">
+                <?php foreach ($errors as $e): ?>
+                    <li><?= htmlspecialchars($e); ?></li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
+        <a href="<?= URL_ROOT ?>/index.php" class="btn btn-secondary">Go Back</a>
+    </div>
+<?php endif; ?>
 
-    <?php if (!empty($error)): ?>
-        <p class="text-danger"><?= htmlspecialchars($error); ?></p>
-    <?php endif; ?>
-
-    <form method="post">
-
-        <h4 class="mt-3">Task Info</h4>
-
-        <label class="form-label">Task Name</label>
-        <input
-            type="text"
-            name="task_name"
-            class="form-control mb-3"
-            value="<?= htmlspecialchars($task['task_name']); ?>"
-            required
-        >
-
-        <label class="form-label">Task Priority</label>
-        <select name="task_priority" class="form-select mb-3">
-            <option value="Low" <?= $task['task_priority'] === 'Low' ? 'selected' : '' ?>>Low</option>
-            <option value="Medium" <?= $task['task_priority'] === 'Medium' ? 'selected' : '' ?>>Medium</option>
-            <option value="High" <?= $task['task_priority'] === 'High' ? 'selected' : '' ?>>High</option>
-        </select>
-
-        <label class="form-label">Task Time Estimate (Minutes)</label>
-        <input
-            type="number"
-            name="task_time_estimate"
-            class="form-control mb-3"
-            value="<?= htmlspecialchars($task['task_time_estimate']); ?>"
-        >
-
-        <label class="form-label">Task Deadline</label>
-        <input
-            type="datetime-local"
-            name="task_deadline"
-            class="form-control mb-3"
-            value="<?= htmlspecialchars(str_replace(' ', 'T', $task['task_deadline'])); ?>"
-        >
-
-        <label class="form-label">Task Status</label>
-        <select name="task_status" class="form-select mb-3">
-            <option value="Not Started" <?= $task['task_status'] === 'Not Started' ? 'selected' : '' ?>>Not Started</option>
-            <option value="In Progress" <?= $task['task_status'] === 'In Progress' ? 'selected' : '' ?>>In Progress</option>
-            <option value="Completed" <?= $task['task_status'] === 'Completed' ? 'selected' : '' ?>>Completed</option>
-        </select>
-
-        <button class="btn btn-primary">Save Changes</button>
-        <a href="<?= URL_ROOT ?>/crud/tasks.php" class="btn btn-secondary">Cancel</a>
-
-    </form>
-</main>
+<?php if (isset($success)): ?>
+    <div class="container mt-4">
+        <div class="alert alert-success">
+            <h2>Task Created!</h2>
+            <p>Your task <strong><?= htmlspecialchars($taskName) ?></strong> has been added.</p>
+        </div>
+        <a href="<?= URL_ROOT ?>/crud/tasks.php" class="btn btn-primary">View Tasks</a>
+        <a href="<?= URL_ROOT ?>/index.php"       class="btn btn-secondary ms-2">Add Another</a>
+    </div>
+<?php endif; ?>
 
 <?php require_once INCLUDES . 'footer.php'; ?>

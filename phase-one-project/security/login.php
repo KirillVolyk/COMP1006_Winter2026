@@ -1,20 +1,19 @@
 <?php
 session_start();
+
 // this file handles proper pathing
 require_once dirname(__DIR__) . '/config.php';
 
-require "../includes/connect.php";
-require "../includes/header.php";
+require_once INCLUDES . 'connect.php';
+require_once INCLUDES . 'header.php';
 
 // Already logged in? Skip to tasks.
 if (isset($_SESSION['user_id'])) {
-    header("Location: tasks.php");
+    header("Location: " . URL_ROOT . "/crud/tasks.php");
     exit;
 }
 
-// ── reCAPTCHA credentials ────────────────────────────────
-// Replace these with your keys from:
-// https://www.google.com/recaptcha/admin/create  (choose v2 "I'm not a robot")
+// ── reCAPTCHA credentials (uncomment when going live) ────
 // define('RECAPTCHA_SITE_KEY',   '6Le2mbEsAAAAABNjVNH2udfYeQxnnqFC-LucdpRe');
 // define('RECAPTCHA_SECRET_KEY', '6Le2mbEsAAAAANG_RTqurPQrtZYoEGR_PfpdpvXG');
 
@@ -28,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = "Username/email and password are required.";
     } else {
 
-        // recAPTCHA verification 
+        // ── reCAPTCHA verification (commented out for testing) ──
         // $recaptchaResponse = $_POST['g-recaptcha-response'] ?? '';
         // $verifyData = http_build_query([
         //     'secret'   => RECAPTCHA_SECRET_KEY,
@@ -40,10 +39,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // $context = stream_context_create($opts);
         // $result  = file_get_contents('https://www.google.com/recaptcha/api/siteverify', false, $context);
         // $json    = json_decode($result, true);
-        
+        //
         // if (empty($json['success'])) {
         //     $error = "Please complete the reCAPTCHA.";
-        // } else { well i broke it somewhere here whoops
+        // } else {
 
             $sql = "SELECT id, username, email, password
                     FROM users
@@ -61,20 +60,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['user_id']  = $user['id'];
                 $_SESSION['username'] = $user['username'];
 
-                header("Location: ../crud/tasks.php");
+                header("Location: " . URL_ROOT . "/crud/tasks.php");
                 exit;
             } else {
                 $error = "Invalid credentials. Please try again.";
             }
 
-         } 
+        // } // recaptcha commented out
 
     }
-// }
+}
 ?>
 
-<!-- reCAPTCHA script  -->
-<!-- <script src="https://www.google.com/recaptcha/api.js" async defer></script>  -->
+<!-- <script src="https://www.google.com/recaptcha/api.js" async defer></script> -->
 
 <main class="container mt-4">
     <h2>Login</h2>
@@ -104,12 +102,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             required
         >
 
-        <!-- reCAPTCHA widget -->
-        <!-- <div class="g-recaptcha mb-4" data-sitekey="<?= RECAPTCHA_SITE_KEY ?>"></div>  -->
+        <!-- <div class="g-recaptcha mb-4" data-sitekey="<?= defined('RECAPTCHA_SITE_KEY') ? RECAPTCHA_SITE_KEY : '' ?>"></div> -->
 
         <button type="submit" class="btn btn-primary">Login</button>
         <a href="register.php" class="btn btn-secondary">Create Account</a>
     </form>
 </main>
 
-<?php require "../includes/footer.php"; ?>
+<?php require_once INCLUDES . 'footer.php'; ?>
