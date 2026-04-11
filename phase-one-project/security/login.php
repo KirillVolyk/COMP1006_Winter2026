@@ -15,8 +15,8 @@ if (isset($_SESSION['user_id'])) {
 // ── reCAPTCHA credentials ────────────────────────────────
 // Replace these with your keys from:
 // https://www.google.com/recaptcha/admin/create  (choose v2 "I'm not a robot")
-define('RECAPTCHA_SITE_KEY',   '6Le2mbEsAAAAABNjVNH2udfYeQxnnqFC-LucdpRe');
-define('RECAPTCHA_SECRET_KEY', '6Le2mbEsAAAAANG_RTqurPQrtZYoEGR_PfpdpvXG');
+// define('RECAPTCHA_SITE_KEY',   '6Le2mbEsAAAAABNjVNH2udfYeQxnnqFC-LucdpRe');
+// define('RECAPTCHA_SECRET_KEY', '6Le2mbEsAAAAANG_RTqurPQrtZYoEGR_PfpdpvXG');
 
 $error = "";
 
@@ -29,21 +29,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
 
         // recAPTCHA verification 
-        $recaptchaResponse = $_POST['g-recaptcha-response'] ?? '';
-        $verifyData = http_build_query([
-            'secret'   => RECAPTCHA_SECRET_KEY,
-            'response' => $recaptchaResponse,
-            'remoteip' => $_SERVER['REMOTE_ADDR'],
-        ]);
-        $opts    = ['http' => ['method' => 'POST', 'content' => $verifyData,
-                               'header' => "Content-Type: application/x-www-form-urlencoded\r\n"]];
-        $context = stream_context_create($opts);
-        $result  = file_get_contents('https://www.google.com/recaptcha/api/siteverify', false, $context);
-        $json    = json_decode($result, true);
+        // $recaptchaResponse = $_POST['g-recaptcha-response'] ?? '';
+        // $verifyData = http_build_query([
+        //     'secret'   => RECAPTCHA_SECRET_KEY,
+        //     'response' => $recaptchaResponse,
+        //     'remoteip' => $_SERVER['REMOTE_ADDR'],
+        // ]);
+        // $opts    = ['http' => ['method' => 'POST', 'content' => $verifyData,
+        //                        'header' => "Content-Type: application/x-www-form-urlencoded\r\n"]];
+        // $context = stream_context_create($opts);
+        // $result  = file_get_contents('https://www.google.com/recaptcha/api/siteverify', false, $context);
+        // $json    = json_decode($result, true);
         
-        if (empty($json['success'])) {
-            $error = "Please complete the reCAPTCHA.";
-        } else {
+        // if (empty($json['success'])) {
+        //     $error = "Please complete the reCAPTCHA.";
+        // } else { well i broke it somewhere here whoops
 
             $sql = "SELECT id, username, email, password
                     FROM users
@@ -70,11 +70,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
          } 
 
     }
-}
+// }
 ?>
 
 <!-- reCAPTCHA script  -->
-<script src="https://www.google.com/recaptcha/api.js" async defer></script> 
+<!-- <script src="https://www.google.com/recaptcha/api.js" async defer></script>  -->
 
 <main class="container mt-4">
     <h2>Login</h2>
@@ -105,7 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         >
 
         <!-- reCAPTCHA widget -->
-        <div class="g-recaptcha mb-4" data-sitekey="<?= RECAPTCHA_SITE_KEY ?>"></div> 
+        <!-- <div class="g-recaptcha mb-4" data-sitekey="<?= RECAPTCHA_SITE_KEY ?>"></div>  -->
 
         <button type="submit" class="btn btn-primary">Login</button>
         <a href="register.php" class="btn btn-secondary">Create Account</a>

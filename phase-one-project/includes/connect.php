@@ -1,12 +1,12 @@
 <?php 
-$host     = "172.31.22.43";
-$db       = "Kirill200638948";
-$user     = "Kirill200638948";
-$password = "gla4Z4boty";
-// $host     = "localhost";
-// $db       = "tasksdb";
-// $user     = "root";
-// $password = "";
+// $host     = "172.31.22.43";
+// $db       = "Kirill200638948";
+// $user     = "Kirill200638948";
+// $password = "gla4Z4boty";
+$host     = "localhost";
+$db       = "tasksdb";
+$user     = "root";
+$password = "";
 
 //points to the database
 $dsn = "mysql:host=$host;dbname=$db";
